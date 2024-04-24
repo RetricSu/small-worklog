@@ -1,5 +1,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
+use chrono::{DateTime, Local};
 use eframe::egui;
 use types::Task;
 
@@ -42,7 +43,10 @@ impl Default for MyApp {
 impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
-            ui.heading("My WorkLog");
+            let now: DateTime<Local> = Local::now();
+            let date_string = now.format("%Y-%m-%d").to_string();
+
+            ui.heading(&format!("{} {}", "🔆", date_string));
 
             ui.add_space(12.0);
 
