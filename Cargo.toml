@@ -2,11 +2,15 @@
 name = "small-worklog"
 version = "0.1.0"
 authors = ["RetricSu <inneverland2013@gmail.com>"]
+description = "A lightweight desktop app to record daily work logs."
 license = "MIT"
 edition = "2021"
 rust-version = "1.72"
 publish = false
 
+[package.metadata.bundle]
+name = "small-worklog"
+identifier = "small.work.log.app"
 
 [dependencies]
 chrono = "0.4.38"
@@ -18,7 +22,6 @@ eframe = {version = "0.27.2", features = [
 egui_extras = { version = "0.27.2", features = ["default", "image"] }
 
 # For image support:
-
 env_logger = { version = "0.10", default-features = false, features = [
     "auto-color",
     "humantime",
