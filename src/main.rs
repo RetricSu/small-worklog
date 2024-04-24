@@ -1,6 +1,10 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
 use eframe::egui;
+use types::Task;
+
+mod store;
+mod types;
 
 fn main() -> Result<(), eframe::Error> {
     env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
@@ -20,11 +24,6 @@ fn main() -> Result<(), eframe::Error> {
     )
 }
 
-struct Task {
-    description: String,
-    completed: bool,
-}
-
 struct MyApp {
     new_task: String,
     todo_list: Vec<Task>,
@@ -32,9 +31,10 @@ struct MyApp {
 
 impl Default for MyApp {
     fn default() -> Self {
+        let tasks = store::load_tasks().unwrap_or_default();
         Self {
             new_task: "".to_owned(),
-            todo_list: vec![],
+            todo_list: tasks,
         }
     }
 }
@@ -50,11 +50,13 @@ impl eframe::App for MyApp {
                 ui.add(egui::TextEdit::singleline(&mut self.new_task).desired_width(f32::INFINITY));
 
                 if ui.input(|input| input.key_pressed(egui::Key::Enter)) {
-                    self.todo_list.push(Task {
-                        description: self.new_task.clone(),
-                        completed: false,
-                    });
+                    self.todo_list.push(Task::new(self.new_task.clone()));
                     self.new_task.clear(); // Reset input field
+
+                    // save in the store
+                    store::store_tasks(&self.todo_list).unwrap_or_else(|err| {
+                        eprintln!("Failed to store tasks: {}", err);
+                    });
                 }
             });
 
@@ -79,7 +81,18 @@ impl eframe::App for MyApp {
             // Remove tasks outside the loop
             for &index in tasks_to_remove.iter().rev() {
                 self.todo_list.remove(index);
+
+                // save in the store
+                store::store_tasks(&self.todo_list).unwrap_or_else(|err| {
+                    eprintln!("Failed to store tasks: {}", err);
+                });
             }
+        });
+    }
+
+    fn save(&mut self, _storage: &mut dyn eframe::Storage) {
+        store::store_tasks(&self.todo_list).unwrap_or_else(|err| {
+            eprintln!("Failed to store tasks: {}", err);
         });
     }
 }
