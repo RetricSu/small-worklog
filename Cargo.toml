@@ -1,0 +1,23 @@
+[package]
+name = "small-worklog"
+version = "0.1.0"
+authors = ["RetricSu <inneverland2013@gmail.com>"]
+license = "MIT"
+edition = "2021"
+rust-version = "1.72"
+publish = false
+
+
+[dependencies]
+eframe = { features = [
+    "default",
+    "__screenshot", # __screenshot is so we can dump a screenshot using EFRAME_SCREENSHOT_TO
+] }
+
+# For image support:
+egui_extras = { features = ["default", "image"] }
+
+env_logger = { version = "0.10", default-features = false, features = [
+    "auto-color",
+    "humantime",
+] }
