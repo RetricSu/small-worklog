@@ -69,12 +69,19 @@ impl eframe::App for MyApp {
             // Display todo list
             let mut tasks_to_remove = vec![];
 
-            for (index, task) in self.todo_list.iter_mut().enumerate() {
+            for (index, task) in self
+                .todo_list
+                .iter_mut()
+                .filter(|todo| todo.is_today() || !todo.completed)
+                .enumerate()
+            {
                 ui.horizontal(|ui| {
                     let description = task.description.clone();
-                    let completed = &mut task.completed;
+                    let mut completed = task.completed;
 
-                    ui.checkbox(completed, "");
+                    if ui.checkbox(&mut completed, "").clicked() {
+                        task.completed = completed;
+                    }
                     ui.label(description);
                     if ui.button("Delete").clicked() {
                         tasks_to_remove.push(index);
@@ -85,12 +92,13 @@ impl eframe::App for MyApp {
             // Remove tasks outside the loop
             for &index in tasks_to_remove.iter().rev() {
                 self.todo_list.remove(index);
-
-                // save in the store
-                store::store_tasks(&self.todo_list).unwrap_or_else(|err| {
-                    eprintln!("Failed to store tasks: {}", err);
-                });
             }
+
+            tasks_to_remove.clear();
+
+            store::store_tasks(&self.todo_list).unwrap_or_else(|err| {
+                eprintln!("Failed to store tasks: {}", err);
+            });
         });
     }
 

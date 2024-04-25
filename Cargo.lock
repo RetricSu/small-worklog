@@ -2584,6 +2584,7 @@ dependencies = [
  "eframe",
  "egui_extras",
  "env_logger",
+ "rand",
  "serde",
  "serde_json",
 ]
