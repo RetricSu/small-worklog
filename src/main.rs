@@ -1,5 +1,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
+use std::time::{SystemTime, UNIX_EPOCH};
+
 use chrono::{DateTime, Local};
 use eframe::egui;
 use types::Task;
@@ -81,6 +83,18 @@ impl eframe::App for MyApp {
 
                     if ui.checkbox(&mut completed, "").clicked() {
                         task.completed = completed;
+
+                        // update the completed_at
+                        if completed {
+                            let now = SystemTime::now();
+                            let completed_at = now
+                                .duration_since(UNIX_EPOCH)
+                                .expect("Time went backwards")
+                                .as_secs();
+                            task.completed_at = completed_at;
+                        } else {
+                            task.completed_at = 0;
+                        }
                     }
                     ui.label(description);
                     if ui.button("Delete").clicked() {

@@ -10,6 +10,7 @@ pub struct Task {
     pub completed: bool,
     pub created_at: u64, // Use a u64 to represent the timestamp
     pub created_at_date: String,
+    pub completed_at: u64, // Use a u64 to represent the timestamp
 }
 
 impl Task {
@@ -27,6 +28,7 @@ impl Task {
             completed: false,
             created_at,
             created_at_date,
+            completed_at: 0,
         }
     }
 
