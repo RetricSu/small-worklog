@@ -44,7 +44,7 @@ impl Default for MyApp {
 
 impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        egui::CentralPanel::default().show(ctx, |ui| {
+        egui::TopBottomPanel::top("top-panel").show(ctx, |ui| {
             let faded_color = ui.visuals().window_fill();
             let faded_color = |color: Color32| -> Color32 {
                 use egui::Rgba;
@@ -83,7 +83,15 @@ impl eframe::App for MyApp {
             });
 
             ui.add_space(12.0);
+        });
 
+        egui::CentralPanel::default().show(ctx, |ui| {
+            let faded_color = ui.visuals().window_fill();
+            let faded_color = |color: Color32| -> Color32 {
+                use egui::Rgba;
+                let t = { 0.8 };
+                egui::lerp(Rgba::from(color)..=Rgba::from(faded_color), t).into()
+            };
             // Display todo list
             let mut tasks_to_remove = vec![];
 
