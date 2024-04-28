@@ -94,16 +94,15 @@ impl eframe::App for MyApp {
                 egui::lerp(Rgba::from(color)..=Rgba::from(faded_color), t).into()
             };
             // Display todo list
-            let mut tasks_to_remove = vec![];
+            let mut tasks_to_remove: Vec<String> = vec![];
 
             egui::ScrollArea::vertical().show(ui, |ui| {
                 // Add a lot of widgets here.
 
-                for (index, task) in self
+                for task in self
                     .todo_list
                     .iter_mut()
                     .filter(|todo| todo.is_today() || !todo.completed)
-                    .enumerate()
                 {
                     ui.horizontal(|ui| {
                         let description = task.description.clone();
@@ -136,7 +135,7 @@ impl eframe::App for MyApp {
                                     )
                                     .clicked()
                                 {
-                                    tasks_to_remove.push(index);
+                                    tasks_to_remove.push(task.id.clone());
                                 }
                             });
                         });
@@ -145,8 +144,8 @@ impl eframe::App for MyApp {
             });
 
             // Remove tasks outside the loop
-            for &index in tasks_to_remove.iter().rev() {
-                self.todo_list.remove(index);
+            for id in tasks_to_remove.iter().rev() {
+                self.todo_list.retain(|task| task.id.ne(id));
             }
 
             tasks_to_remove.clear();
