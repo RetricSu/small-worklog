@@ -3,7 +3,7 @@ use rand::Rng;
 use serde::{Deserialize, Serialize};
 use std::time::{SystemTime, UNIX_EPOCH};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Task {
     pub id: String,
     pub description: String,
@@ -38,6 +38,12 @@ impl Task {
             .unwrap()
             .date_naive();
         task_date == today
+    }
+
+    // Function to get the date string from created_at timestamp
+    pub fn created_at_date(&self) -> String {
+        let created_at_datetime = DateTime::from_timestamp(self.created_at as i64, 0).unwrap();
+        created_at_datetime.date_naive().to_string()
     }
 }
 
