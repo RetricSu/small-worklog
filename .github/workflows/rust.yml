@@ -19,13 +19,9 @@ jobs:
         run: |
           rustup update stable
           rustup default stable
-      - name: Install cargo-bundle
-        run: cargo install cargo-bundle
       - name: Cargo fmt
         run: cargo fmt --all -- --check
       - name: Cargo clippy
         run: cargo clippy -- -D warnings
       - name: Cargo build
         run: cargo build --verbose
-      - name: Cargo bundle
-        run: cargo bundle --release

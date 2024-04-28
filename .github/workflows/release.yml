@@ -1,0 +1,85 @@
+name: Release
+
+on:
+  push:
+    branches: [master]
+    tags:
+      - 'v*'
+
+permissions: # Define the permissions for the GITHUB_TOKEN
+  contents: write
+  actions: write
+  deployments: write
+  pages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Install cargo-bundle
+        run: cargo install cargo-bundle
+
+      - name: Cargo build and bundle for Windows
+        run: cargo bundle --release --target x86_64-pc-windows-msvc
+        env:
+          CARGO_TERM_COLOR: always
+      - name: Cargo build and bundle for Linux
+        run: cargo bundle --release --target x86_64-unknown-linux-gnu
+        env:
+          CARGO_TERM_COLOR: always
+      - name: Cargo build and bundle for macOS
+        run: cargo bundle --release --target x86_64-apple-darwin
+        env:
+          CARGO_TERM_COLOR: always
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Windows Bundle
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./target/x86_64-pc-windows-msvc/release/small-worklog.exe
+          asset_name: small-worklog_windows.exe
+          asset_content_type: application/octet-stream
+
+      - name: Upload Linux Bundle
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./target/x86_64-unknown-linux-gnu/release/small-worklog
+          asset_name: small-worklog_linux
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS Bundle
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./target/x86_64-apple-darwin/release/small-worklog.app.zip
+          asset_name: SmallWorklog_macOS.zip
+          asset_content_type: application/zip
