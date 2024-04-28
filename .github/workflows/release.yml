@@ -13,9 +13,34 @@ permissions: # Define the permissions for the GITHUB_TOKEN
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - os: macos-latest
+          TARGET: aarch64-apple-darwin
 
+        - os: macos-latest
+          TARGET: x86_64-apple-darwin
+
+        - os: ubuntu-latest
+          TARGET: arm-unknown-linux-musleabihf
+
+        - os: ubuntu-latest
+          TARGET: armv7-unknown-linux-musleabihf
+
+        - os: ubuntu-latest
+          TARGET: x86_64-unknown-linux-musl
+
+        - os: windows-latest
+          TARGET: x86_64-pc-windows-msvc
+          EXTENSION: .exe
+
+    runs-on: ${{ matrix.os }}
     steps:
+      - name: Building ${{ matrix.TARGET }}
+        run: echo "${{ matrix.TARGET }}"
+
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -23,70 +48,32 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
+          target: ${{ matrix.TARGET }}
+          override: true
 
       - name: Install cargo-bundle
         run: cargo install cargo-bundle
 
-      - name: Install Windows toolchain
-        run: rustup target add x86_64-pc-windows-gnu
-
-      - name: Install Gcc-mingw-w64
-        run: sudo apt-get install gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 -y
-
       - name: Cargo build and bundle for Windows
-        run: cargo build --release --target x86_64-pc-windows-gnu
+        run: cargo build --release --target=${{ matrix.TARGET }}
         env:
           CARGO_TERM_COLOR: always
 
-      - name: Cargo build and bundle for Linux
-        run: cargo bundle --release --target x86_64-unknown-linux-gnu
-        env:
-          CARGO_TERM_COLOR: always
+      - name: Rename
+        run: cp target/${{ matrix.TARGET }}/release/small-worklog${{ matrix.EXTENSION }} small-worklog-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
 
-      - name: Cargo build and bundle for macOS
-        run: cargo bundle --release --target x86_64-apple-darwin
-        env:
-          CARGO_TERM_COLOR: always
-
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/upload-artifact@master
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: |
-            Release ${{ github.ref }}
-          draft: false
-          prerelease: false
+        name: small-worklog-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
+        path: ./target/${{ matrix.TARGET }}/release/small-worklog${{ matrix.EXTENSION }}
 
-      - name: Upload Windows Bundle
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: svenstaro/upload-release-action@v2
+        name: Upload binaries to release
+        if: ${{ github.event_name == 'push' }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./target/x86_64-pc-windows-gnu/release/small-worklog.exe
-          asset_name: small-worklog_windows.exe
-          asset_content_type: application/octet-stream
-
-      - name: Upload Linux Bundle
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./target/x86_64-unknown-linux-gnu/release/small-worklog
-          asset_name: small-worklog_linux
-          asset_content_type: application/octet-stream
-
-      - name: Upload macOS Bundle
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./target/x86_64-apple-darwin/release/small-worklog.app.zip
-          asset_name: SmallWorklog_macOS.zip
-          asset_content_type: application/zip
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: eframe_template-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
+          asset_name: eframe_template-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
+          tag: ${{ github.ref }}
+          prerelease: ${{ !startsWith(github.ref, 'refs/tags/') }}
+          overwrite: true
