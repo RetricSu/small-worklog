@@ -2,7 +2,6 @@ name: Release
 
 on:
   push:
-    branches: [master]
     tags:
       - 'v*'
 
@@ -28,14 +27,19 @@ jobs:
       - name: Install cargo-bundle
         run: cargo install cargo-bundle
 
+      - name: Install Windows toolchain
+        run: rustup target add x86_64-pc-windows-msvc
+
       - name: Cargo build and bundle for Windows
         run: cargo bundle --release --target x86_64-pc-windows-msvc
         env:
           CARGO_TERM_COLOR: always
+
       - name: Cargo build and bundle for Linux
         run: cargo bundle --release --target x86_64-unknown-linux-gnu
         env:
           CARGO_TERM_COLOR: always
+
       - name: Cargo build and bundle for macOS
         run: cargo bundle --release --target x86_64-apple-darwin
         env:
