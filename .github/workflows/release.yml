@@ -2,6 +2,7 @@ name: Release
 
 on:
   push:
+    branches: ["fix-build-ci"]
     tags:
       - 'v*'
 
@@ -13,7 +14,6 @@ permissions: # Define the permissions for the GITHUB_TOKEN
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
@@ -37,6 +37,7 @@ jobs:
           TARGET: x86_64-pc-windows-msvc
           EXTENSION: .exe
 
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Building ${{ matrix.TARGET }}
         run: echo "${{ matrix.TARGET }}"

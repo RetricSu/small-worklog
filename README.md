@@ -4,7 +4,7 @@ A lightweight desktop app to record and show daily work logs.
 
 Build on [egui](https://www.egui.rs/).
 
-![product-screen-shot](/assets/product.jpg)
+![product-screen-shot](/assets/product-3.png)
 
 ## Develop
 
