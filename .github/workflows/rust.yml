@@ -27,5 +27,3 @@ jobs:
         run: cargo clippy -- -D warnings
       - name: Cargo build
         run: cargo build --verbose
-      - name: Cargo bundle
-        run: cargo bundle --release
