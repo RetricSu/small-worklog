@@ -3,9 +3,12 @@
 mod app;
 mod store;
 mod types;
+mod version;
+
 use app::MyApp;
 use eframe::egui::{self};
 use types::Task;
+use version::read_version_from_toml;
 
 fn main() -> Result<(), eframe::Error> {
     env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
@@ -13,8 +16,9 @@ fn main() -> Result<(), eframe::Error> {
         viewport: egui::ViewportBuilder::default().with_inner_size([520.0, 340.0]),
         ..Default::default()
     };
+    let version = read_version_from_toml().unwrap_or_else(|| "v-unknown".to_string());
     eframe::run_native(
-        "Worklog",
+        format!("Small Worklog v{}", version).as_str(),
         options,
         Box::new(|cc| {
             // This gives us image support:
