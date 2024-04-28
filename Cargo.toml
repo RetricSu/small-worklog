@@ -1,6 +1,6 @@
 [package]
 name = "small-worklog"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["RetricSu <inneverland2013@gmail.com>"]
 description = "A lightweight desktop app to record daily work logs."
 license = "MIT"
@@ -11,6 +11,9 @@ publish = false
 [package.metadata.bundle]
 name = "small-worklog"
 identifier = "small.work.log.app"
+
+[features]
+check_version = []
 
 [dependencies]
 chrono = "0.4.38"

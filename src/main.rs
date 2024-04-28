@@ -16,9 +16,8 @@ fn main() -> Result<(), eframe::Error> {
         viewport: egui::ViewportBuilder::default().with_inner_size([520.0, 340.0]),
         ..Default::default()
     };
-    let version = read_version_from_toml().unwrap_or_else(|| "v-unknown".to_string());
     eframe::run_native(
-        format!("Small Worklog v{}", version).as_str(),
+        format!("Small Worklog v{}", read_version_from_toml()).as_str(),
         options,
         Box::new(|cc| {
             // This gives us image support:
