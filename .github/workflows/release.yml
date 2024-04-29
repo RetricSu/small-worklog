@@ -24,12 +24,6 @@ jobs:
             TARGET: x86_64-apple-darwin
 
           - os: ubuntu-latest
-            TARGET: arm-unknown-linux-musleabihf
-
-          - os: ubuntu-latest
-            TARGET: armv7-unknown-linux-musleabihf
-
-          - os: ubuntu-latest
             TARGET: x86_64-unknown-linux-musl
 
           - os: windows-latest

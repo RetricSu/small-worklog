@@ -6,6 +6,12 @@ Build on [egui](https://www.egui.rs/).
 
 ![product-screen-shot](/assets/product-3.png)
 
+## Install
+
+Download the app according to your OS from the release page:
+
+https://github.com/RetricSu/small-worklog/releases
+
 ## Develop
 
 ```sh

@@ -1,4 +1,4 @@
-pub const VERSION: &str = "0.1.1";
+pub const VERSION: &str = "0.1.2";
 
 pub fn read_version_from_toml() -> String {
     #[cfg(feature = "check_version")]
