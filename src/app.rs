@@ -125,7 +125,7 @@ impl eframe::App for MyApp {
                                         task.completed_at = 0;
                                     }
                                 }
-                                ui.label(description);
+                                ui.label(description.trim_end());
 
                                 if ui
                                     .add(
@@ -224,7 +224,7 @@ fn ui_history(ui: &mut Ui, tasks: &[Task]) {
                             } else {
                                 "\u{2795}"
                             };
-                            ui.label(format!("{} {}", is_completed, task.description));
+                            ui.label(format!("{} {}", is_completed, task.description).trim_end());
                         });
                     }
                     ui.separator();
