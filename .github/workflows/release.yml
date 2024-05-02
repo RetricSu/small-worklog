@@ -22,12 +22,12 @@ jobs:
           - os: macos-latest
             TARGET: aarch64-apple-darwin
             BUNDLE: true
-            EXTENSION: .app
+            EXTENSION: .zip
 
           - os: macos-latest
             TARGET: x86_64-apple-darwin
             BUNDLE: true
-            EXTENSION: .app
+            EXTENSION: .zip
 
           - os: ubuntu-latest
             TARGET: x86_64-unknown-linux-musl
@@ -76,7 +76,8 @@ jobs:
       - name: Package macOS bundle
         if: ${{ matrix.BUNDLE == true }}
         run: |
-          cp target/${{ matrix.TARGET }}/release/bundle/osx/small-worklog${{ matrix.EXTENSION }} target/${{ matrix.TARGET }}/release/small-worklog${{ matrix.EXTENSION }}
+          brew install zip
+          zip -r target/${{ matrix.TARGET }}/release/small-worklog${{ matrix.EXTENSION }} target/${{ matrix.TARGET }}/release/bundle/osx/small-worklog.app
 
       - name: Rename
         run: cp target/${{ matrix.TARGET }}/release/small-worklog${{ matrix.EXTENSION }} small-worklog-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
