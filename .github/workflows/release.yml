@@ -53,11 +53,9 @@ jobs:
           target: ${{ matrix.TARGET }}
           override: true
 
-      - name: Install cargo-bundle
-        run: |
-          if [ "${{ matrix.BUNDLE }}" = true ]; then
-            cargo install cargo-bundle
-          fi
+      - name: Install cargo-bundle if needed
+        if: ${{ matrix.BUNDLE == 'true' }}
+        run: cargo install cargo-bundle
 
       - name: Cargo build or bundle
         run: |
@@ -73,7 +71,7 @@ jobs:
         if: ${{ matrix.BUNDLE }} == true
         run: |
           brew install zip
-          zip -r target/${{ matrix.TARGET }}/release/small-worklog-${{ matrix.TARGET }}${{ matrix.EXTENSION }} target/${{ matrix.TARGET }}/release/bundle/osx/small-worklog.app
+          zip -r target/${{ matrix.TARGET }}/release/small-worklog${{ matrix.EXTENSION }} target/${{ matrix.TARGET }}/release/bundle/osx/small-worklog.app
 
       - name: Rename
         run: cp target/${{ matrix.TARGET }}/release/small-worklog${{ matrix.EXTENSION }} small-worklog-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
