@@ -19,15 +19,21 @@ jobs:
         include:
           - os: macos-latest
             TARGET: aarch64-apple-darwin
+            BUNDLE: true
+            EXTENSION: .zip
 
           - os: macos-latest
             TARGET: x86_64-apple-darwin
+            BUNDLE: true
+            EXTENSION: .zip
 
           - os: ubuntu-latest
             TARGET: x86_64-unknown-linux-musl
+            BUNDLE: false
 
           - os: windows-latest
             TARGET: x86_64-pc-windows-msvc
+            BUNDLE: false
             EXTENSION: .exe
 
     runs-on: ${{ matrix.os }}
@@ -46,12 +52,28 @@ jobs:
           override: true
 
       - name: Install cargo-bundle
-        run: cargo install cargo-bundle
+        run: |
+          if [ "${{ matrix.BUNDLE }}" = true ]; then
+            cargo install cargo-bundle
+          fi
 
-      - name: Cargo build and bundle for Windows
-        run: cargo build --release --target=${{ matrix.TARGET }}
+      - name: Cargo build or bundle
+        run: |
+          if [ "${{ matrix.BUNDLE }}" = true ]; then
+            cargo bundle --release --target=${{ matrix.TARGET }}
+          else
+            cargo build --release --target=${{ matrix.TARGET }}
+          fi
         env:
           CARGO_TERM_COLOR: always
+
+      - name: Package macOS bundle
+        if: ${{ matrix.BUNDLE }} == true
+        run: |
+          brew install zip
+          cd target/${{ matrix.TARGET }}/release
+          zip -r small-worklog-${{ matrix.TARGET }}${{ matrix.EXTENSION }} small-worklog.app
+          cd ../..
 
       - name: Rename
         run: cp target/${{ matrix.TARGET }}/release/small-worklog${{ matrix.EXTENSION }} small-worklog-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
