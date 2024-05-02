@@ -1,7 +1,8 @@
 use crate::types::Task;
 use rusqlite::{Connection, Result};
+use std::path::PathBuf;
 
-const DATABASE_FILE: &str = "tasks.db";
+const DATABASE_FILE: &str = "small-worklog.db";
 
 pub struct Store {
     connection: Connection,
@@ -9,7 +10,9 @@ pub struct Store {
 
 impl Store {
     pub fn new(db_path: &str) -> Result<Self> {
-        let connection = Connection::open(db_path)?;
+        let mut path = PathBuf::new();
+        path.push(db_path);
+        let connection = Connection::open(path)?;
         connection.execute(
             "CREATE TABLE IF NOT EXISTS tasks (
                 id TEXT PRIMARY KEY,
@@ -25,7 +28,13 @@ impl Store {
     }
 
     pub fn default() -> Result<Self> {
-        Self::new(DATABASE_FILE) // Creates an in-memory database
+        let mut path = dirs::home_dir().unwrap_or_default();
+        path.push(DATABASE_FILE);
+        let db_path = path.to_str().expect("Invalid database path");
+
+        println!("db store: {}", db_path);
+
+        Self::new(db_path) // Creates an in-memory database
     }
 
     pub fn add_task(&self, task: &Task) -> Result<()> {
