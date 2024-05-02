@@ -20,9 +20,9 @@ fn main() -> Result<(), eframe::Error> {
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
             .with_decorations(false) // Hide the OS-specific "chrome" around the window
-            .with_inner_size([520.0, 340.0]),
-            //.with_min_inner_size([520.0, 134000.0]),
-            //.with_transparent(true), // To have rounded corners we need transparency,
+            .with_inner_size([520.0, 340.0])
+            .with_min_inner_size([520.0, 340.0])
+            .with_transparent(true), // To have rounded corners we need transparency,
         ..Default::default()
     };
     eframe::run_native(

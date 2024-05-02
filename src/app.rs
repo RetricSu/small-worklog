@@ -38,7 +38,7 @@ impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         frame::custom_window_frame(ctx, "Small Worklog", |ui| {
             ui.label("This is just the contents of the window.");
-            
+
             egui::TopBottomPanel::top("top-panel").show(ctx, |ui| {
                 let faded_color = ui.visuals().window_fill();
                 let faded_color = |color: Color32| -> Color32 {
