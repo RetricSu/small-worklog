@@ -1,6 +1,6 @@
 [package]
 name = "small-worklog"
-version = "0.1.2"
+version = "0.2.0"
 authors = ["RetricSu <inneverland2013@gmail.com>"]
 description = "A lightweight desktop app to record daily work logs."
 license = "MIT"
