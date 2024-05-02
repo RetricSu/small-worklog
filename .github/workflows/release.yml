@@ -73,9 +73,7 @@ jobs:
         if: ${{ matrix.BUNDLE }} == true
         run: |
           brew install zip
-          cd target/${{ matrix.TARGET }}/release
-          zip -r small-worklog-${{ matrix.TARGET }}${{ matrix.EXTENSION }} small-worklog.app
-          cd ../..
+          zip -r target/${{ matrix.TARGET }}/release/small-worklog-${{ matrix.TARGET }}${{ matrix.EXTENSION }} target/${{ matrix.TARGET }}/release/bundle/osx/small-worklog.app
 
       - name: Rename
         run: cp target/${{ matrix.TARGET }}/release/small-worklog${{ matrix.EXTENSION }} small-worklog-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
