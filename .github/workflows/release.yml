@@ -22,12 +22,12 @@ jobs:
           - os: macos-latest
             TARGET: aarch64-apple-darwin
             BUNDLE: true
-            EXTENSION: .zip
+            EXTENSION: .app
 
           - os: macos-latest
             TARGET: x86_64-apple-darwin
             BUNDLE: true
-            EXTENSION: .zip
+            EXTENSION: .app
 
           - os: ubuntu-latest
             TARGET: x86_64-unknown-linux-musl
@@ -45,6 +45,10 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Install musl-gcc if needed
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: sudo apt-get install -y musl-tools
 
       - name: Install Rust
         uses: actions-rs/toolchain@v1
@@ -72,8 +76,7 @@ jobs:
       - name: Package macOS bundle
         if: ${{ matrix.BUNDLE == true }}
         run: |
-          brew install zip
-          zip -r target/${{ matrix.TARGET }}/release/small-worklog${{ matrix.EXTENSION }} target/${{ matrix.TARGET }}/release/bundle/osx/small-worklog.app
+          cp target/${{ matrix.TARGET }}/release/bundle/osx/small-worklog${{ matrix.EXTENSION }} target/${{ matrix.TARGET }}/release/small-worklog${{ matrix.EXTENSION }}
 
       - name: Rename
         run: cp target/${{ matrix.TARGET }}/release/small-worklog${{ matrix.EXTENSION }} small-worklog-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
