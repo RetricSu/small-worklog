@@ -58,13 +58,13 @@ jobs:
         run: cargo install cargo-bundle
 
       - name: Cargo bundle
-        if: ${{ matrix.BUNDLE }} == true
+        if: ${{ matrix.BUNDLE == true }}
         run: cargo bundle --release --target=${{ matrix.TARGET }}
         env:
           CARGO_TERM_COLOR: always
 
       - name: Cargo build
-        if: ${{ matrix.BUNDLE }} == false
+        if: ${{ matrix.BUNDLE == false }}
         run: cargo build --release --target=${{ matrix.TARGET }}
         env:
           CARGO_TERM_COLOR: always
