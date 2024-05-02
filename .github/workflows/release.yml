@@ -19,15 +19,21 @@ jobs:
         include:
           - os: macos-latest
             TARGET: aarch64-apple-darwin
+            BUNDLE: true
+            EXTENSION: .zip
 
           - os: macos-latest
             TARGET: x86_64-apple-darwin
+            BUNDLE: true
+            EXTENSION: .zip
 
           - os: ubuntu-latest
             TARGET: x86_64-unknown-linux-musl
+            BUNDLE: false
 
           - os: windows-latest
             TARGET: x86_64-pc-windows-msvc
+            BUNDLE: false
             EXTENSION: .exe
 
     runs-on: ${{ matrix.os }}
@@ -38,6 +44,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Install musl-gcc if needed
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: sudo apt-get install -y musl-tools
+
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -45,13 +55,27 @@ jobs:
           target: ${{ matrix.TARGET }}
           override: true
 
-      - name: Install cargo-bundle
+      - name: Install cargo-bundle if needed
+        if: ${{ matrix.BUNDLE == true }}
         run: cargo install cargo-bundle
 
-      - name: Cargo build and bundle for Windows
+      - name: Cargo bundle
+        if: ${{ matrix.BUNDLE == true }}
+        run: cargo bundle --release --target=${{ matrix.TARGET }}
+        env:
+          CARGO_TERM_COLOR: always
+
+      - name: Cargo build
+        if: ${{ matrix.BUNDLE == false }}
         run: cargo build --release --target=${{ matrix.TARGET }}
         env:
           CARGO_TERM_COLOR: always
+
+      - name: Package macOS bundle
+        if: ${{ matrix.BUNDLE == true }}
+        run: |
+          brew install zip
+          zip -r target/${{ matrix.TARGET }}/release/small-worklog${{ matrix.EXTENSION }} target/${{ matrix.TARGET }}/release/bundle/osx/small-worklog.app
 
       - name: Rename
         run: cp target/${{ matrix.TARGET }}/release/small-worklog${{ matrix.EXTENSION }} small-worklog-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
