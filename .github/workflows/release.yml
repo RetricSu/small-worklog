@@ -70,7 +70,7 @@ jobs:
           CARGO_TERM_COLOR: always
 
       - name: Package macOS bundle
-        if: ${{ matrix.BUNDLE }} == true
+        if: ${{ matrix.BUNDLE == true }}
         run: |
           brew install zip
           zip -r target/${{ matrix.TARGET }}/release/small-worklog${{ matrix.EXTENSION }} target/${{ matrix.TARGET }}/release/bundle/osx/small-worklog.app
