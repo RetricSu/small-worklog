@@ -54,7 +54,7 @@ jobs:
           override: true
 
       - name: Install cargo-bundle if needed
-        if: ${{ matrix.BUNDLE == 'true' }}
+        if: ${{ matrix.BUNDLE == true }}
         run: cargo install cargo-bundle
 
       - name: Cargo build or bundle
