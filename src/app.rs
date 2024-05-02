@@ -4,6 +4,8 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use crate::store::Store;
+
 use super::store;
 use super::Task;
 
@@ -12,17 +14,17 @@ use eframe::egui::{self, Align, Color32, Layout, Ui};
 
 pub struct MyApp {
     new_task: String,
-    todo_list: Vec<Task>,
     show_deferred_history: Arc<AtomicBool>,
+    store: store::Store,
 }
 
 impl Default for MyApp {
     fn default() -> Self {
-        let tasks = store::load_tasks().unwrap_or_default();
+        let store = Store::default().unwrap();
         Self {
             new_task: "".to_owned(),
-            todo_list: tasks,
             show_deferred_history: Arc::new(AtomicBool::new(false)),
+            store,
         }
     }
 }
@@ -73,13 +75,11 @@ impl eframe::App for MyApp {
                 });
 
                 if ui.input(|input| input.key_pressed(egui::Key::Enter)) {
-                    self.todo_list.push(Task::new(self.new_task.clone()));
+                    let task = Task::new(self.new_task.clone());
                     self.new_task.clear(); // Reset input field
 
                     // save in the store
-                    store::store_tasks(&self.todo_list).unwrap_or_else(|err| {
-                        eprintln!("Failed to store tasks: {}", err);
-                    });
+                    self.store.add_task(&task).unwrap();
                 }
             });
 
@@ -94,13 +94,11 @@ impl eframe::App for MyApp {
                 egui::lerp(Rgba::from(color)..=Rgba::from(faded_color), t).into()
             };
             // Display todo list
-            let mut tasks_to_remove: Vec<String> = vec![];
-
             egui::ScrollArea::vertical().show(ui, |ui| {
                 // Add a lot of widgets here.
 
-                for task in self
-                    .todo_list
+                let mut tasks = self.store.get_all_tasks().unwrap_or_default();
+                for task in tasks
                     .iter_mut()
                     .filter(|todo| todo.is_today() || !todo.completed)
                 {
@@ -124,6 +122,8 @@ impl eframe::App for MyApp {
                                     } else {
                                         task.completed_at = 0;
                                     }
+
+                                    self.store.update_task(task).unwrap();
                                 }
                                 ui.label(description.trim_end());
 
@@ -135,30 +135,19 @@ impl eframe::App for MyApp {
                                     )
                                     .clicked()
                                 {
-                                    tasks_to_remove.push(task.id.clone());
+                                    self.store.delete_task_by_id(&task.id).unwrap();
                                 }
                             });
                         });
                     });
                 }
             });
-
-            // Remove tasks outside the loop
-            for id in tasks_to_remove.iter().rev() {
-                self.todo_list.retain(|task| task.id.ne(id));
-            }
-
-            tasks_to_remove.clear();
-
-            store::store_tasks(&self.todo_list).unwrap_or_else(|err| {
-                eprintln!("Failed to store tasks: {}", err);
-            });
         });
 
         // open the history viewport
         if self.show_deferred_history.load(Ordering::Relaxed) {
             let show_deferred_viewport = self.show_deferred_history.clone();
-            let todo_list: Vec<Task> = self.todo_list.clone();
+            let todo_list: Vec<Task> = self.store.get_all_tasks().unwrap_or_default();
             ctx.show_viewport_deferred(
                 egui::ViewportId::from_hash_of("deferred_history_viewport"),
                 egui::ViewportBuilder::default()
@@ -183,12 +172,6 @@ impl eframe::App for MyApp {
                 },
             );
         }
-    }
-
-    fn save(&mut self, _storage: &mut dyn eframe::Storage) {
-        store::store_tasks(&self.todo_list).unwrap_or_else(|err| {
-            eprintln!("Failed to store tasks: {}", err);
-        });
     }
 }
 

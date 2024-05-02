@@ -1,6 +1,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
 mod app;
+mod migrate;
 mod store;
 mod types;
 mod version;
@@ -12,6 +13,9 @@ use version::read_version_from_toml;
 
 fn main() -> Result<(), eframe::Error> {
     env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
+
+    migrate::try_migrate_v1();
+
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default().with_inner_size([520.0, 340.0]),
         ..Default::default()
