@@ -5,6 +5,7 @@ use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::store::Store;
+use crate::version::read_version_from_toml;
 
 use super::frame;
 use super::store;
@@ -36,10 +37,9 @@ impl eframe::App for MyApp {
     }
 
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        frame::custom_window_frame(ctx, "Small Worklog", |ui| {
-            ui.label("This is just the contents of the window.");
-
-            egui::TopBottomPanel::top("top-panel").show(ctx, |ui| {
+        let title = format!("Small Worklog v{}", read_version_from_toml());
+        frame::custom_window_frame(ctx, title.as_str(), |ui| {
+            egui::TopBottomPanel::top("top-panel").show_inside(ui, |ui| {
                 let faded_color = ui.visuals().window_fill();
                 let faded_color = |color: Color32| -> Color32 {
                     use egui::Rgba;
@@ -94,7 +94,7 @@ impl eframe::App for MyApp {
                 ui.add_space(12.0);
             });
 
-            egui::CentralPanel::default().show(ctx, |ui| {
+            egui::CentralPanel::default().show_inside(ui, |ui| {
                 let faded_color = ui.visuals().window_fill();
                 let faded_color = |color: Color32| -> Color32 {
                     use egui::Rgba;

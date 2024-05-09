@@ -50,7 +50,7 @@ fn title_bar_ui(ui: &mut egui::Ui, title_bar_rect: eframe::epaint::Rect, title: 
         title_bar_rect.center(),
         Align2::CENTER_CENTER,
         title,
-        FontId::proportional(20.0),
+        FontId::proportional(10.0),
         ui.style().visuals.text_color(),
     );
 
