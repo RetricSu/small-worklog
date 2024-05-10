@@ -112,15 +112,6 @@ impl AppFrame {
             ui.style().visuals.text_color(),
         );
 
-        // Paint the line under the title:
-        painter.line_segment(
-            [
-                title_bar_rect.left_bottom() + vec2(1.0, 0.0),
-                title_bar_rect.right_bottom() + vec2(-1.0, 0.0),
-            ],
-            ui.visuals().widgets.noninteractive.bg_stroke,
-        );
-
         // Interact with the title bar (drag to move window):
         if title_bar_response.double_clicked() {
             let is_maximized = ui.input(|i| i.viewport().maximized.unwrap_or(false));
@@ -157,7 +148,8 @@ impl AppFrame {
 
         let mut show_deferred_viewport = self.show_deferred_history.load(Ordering::Relaxed);
 
-        ui.checkbox(&mut show_deferred_viewport, "");
+        ui.checkbox(&mut show_deferred_viewport, "")
+            .on_hover_text("Show history worklog");
         self.show_deferred_history
             .store(show_deferred_viewport, Ordering::Relaxed);
     }
