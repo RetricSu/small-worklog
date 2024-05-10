@@ -37,7 +37,7 @@ impl eframe::App for MyApp {
         let title = format!("{} {}", "🔆", date_string);
 
         self.app_frame.window(ctx, title.as_str(), |ui| {
-            egui::TopBottomPanel::top("top-panel").show_inside(ui, |ui| {
+            egui::CentralPanel::default().show_inside(ui, |ui| {
                 let faded_color = ui.visuals().window_fill();
                 let faded_color = |color: Color32| -> Color32 {
                     use egui::Rgba;
@@ -55,6 +55,7 @@ impl eframe::App for MyApp {
                         ui.add(
                             egui::TextEdit::multiline(&mut self.new_task)
                                 .frame(true)
+                                .hint_text("add new task by press Enter")
                                 .desired_width(f32::INFINITY),
                         );
                     });
@@ -69,15 +70,7 @@ impl eframe::App for MyApp {
                 });
 
                 ui.add_space(12.0);
-            });
 
-            egui::CentralPanel::default().show_inside(ui, |ui| {
-                let faded_color = ui.visuals().window_fill();
-                let faded_color = |color: Color32| -> Color32 {
-                    use egui::Rgba;
-                    let t = { 0.8 };
-                    egui::lerp(Rgba::from(color)..=Rgba::from(faded_color), t).into()
-                };
                 // Display todo list
                 egui::ScrollArea::vertical().show(ui, |ui| {
                     // Add a lot of widgets here.
@@ -112,14 +105,7 @@ impl eframe::App for MyApp {
                                     }
                                     ui.label(description.trim_end());
 
-                                    if ui
-                                        .add(
-                                            egui::Button::new("Delete")
-                                                .small()
-                                                .fill(faded_color(Color32::RED)),
-                                        )
-                                        .clicked()
-                                    {
+                                    if ui.add(egui::Button::new("❌").small()).clicked() {
                                         self.store.delete_task_by_id(&task.id).unwrap();
                                     }
                                 });
