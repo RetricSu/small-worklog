@@ -165,7 +165,7 @@ fn ui_history(ui: &mut Ui, tasks: &[Task]) {
 
     // Sort dates
     let mut sorted_dates: Vec<_> = tasks_by_date.keys().collect();
-    sorted_dates.sort();
+    sorted_dates.sort_by(|a, b| b.cmp(a));
 
     // Begin the UI layout
     ui.vertical_centered(|ui| {
